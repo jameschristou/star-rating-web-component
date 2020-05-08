@@ -78,13 +78,7 @@ class StarRating extends HTMLElement {
       this._emptyStars.appendChild(star);
     }
 
-    // we base the height on the width and the height will always adjust when the width changes
-    // We need to take the number of stars and maintain a proportion. The spacing btwn stars
-    // will be a fixed proportion and then the stars themselves divide the remaining space.
-    // this sizing needs to be recalculated each time.
-    // We use margin-left on the first star, margin-right on the last star and margin-left and
-    // margin-right on remaining stars to set the spacing between stars
-    this.style.height = `${25*(this.clientWidth/137)}px`;
+    this.style.height = `${starWidthInPx}px`;
 
     this.appendChild(this._clonedNode);
   }
@@ -110,6 +104,8 @@ class StarRating extends HTMLElement {
         star.style.width = 0;
       }
     }
+
+    this.style.height = `${starWidthInPx}px`;
   }
 
   static get observedAttributes() {
@@ -118,7 +114,7 @@ class StarRating extends HTMLElement {
   
   attributeChangedCallback(attrName, oldValue, newValue) {
     if(attrName == 'class' || attrName == 'style'){
-      this.style.height = `${25*(this.clientWidth/137)}px`;
+      this.style.height = `${this.getStarWidthInPx()}px`;
       return;
     }
 
@@ -193,7 +189,15 @@ class StarRating extends HTMLElement {
   }
 
   getStarWidthInPx(){
-    return this.clientWidth/(this._numStars + this._spacingRatioOfStarWidth*(this._numStars - 1));
+    // use this rather than this.clientWidth because we need greater than whole number precision
+    // otherwise our stars may not fit correctly if container width is 103.6px but clientWidth tells
+    // us its 104px
+    let rect = this.getBoundingClientRect();
+    if(!rect){
+      return 0;
+    }
+
+    return rect.width/(this._numStars + this._spacingRatioOfStarWidth*(this._numStars - 1));
   }
 
   getSpacingInPx(starWidth){
