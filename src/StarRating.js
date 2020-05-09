@@ -44,43 +44,14 @@ class StarRating extends HTMLElement {
     // we need to create the required stars. We only do this once in this method
     // the only thing we need to worry about changing is the rating value itself
     for(let i = 0; i < this._numStars; i++){
-      let star = starTemplate.content.cloneNode(true).firstChild;
+      let fullStar = starTemplate.content.cloneNode(true).firstChild;
+      let emptyStar = starTemplate.content.cloneNode(true).firstChild;
 
-      let starWidthFactor = this.getWidthFactorForStar(i + 1);
+      this.updateFullStar(fullStar, i, starWidthInPx, spacingInPx);
+      this.updateStar(emptyStar, i, starWidthInPx, spacingInPx);
 
-      if(starWidthFactor > 0){
-        star.style.width = `${starWidthInPx*starWidthFactor}px`;
-      }
-      else{
-        star.style.width = 0;
-      }
-
-      star.style.height = `${starWidthInPx}px`;
-
-      if(i > 0){
-        star.style.marginLeft = `${spacingInPx/2}px`;
-      }
-
-      if(i < this._numStars - 1){
-        star.style.marginRight = `${spacingInPx/2}px`;
-      }
-
-      this._fullStars.appendChild(star);
-    }
-
-    for(let i = 0; i < this._numStars; i++){
-      let star = starTemplate.content.cloneNode(true).firstChild;
-      star.style.width = star.style.height = `${starWidthInPx}px`;
-
-      if(i > 0){
-        star.style.marginLeft = `${spacingInPx/2}px`;
-      }
-
-      if(i < this._numStars - 1){
-        star.style.marginRight = `${spacingInPx/2}px`;
-      }
-
-      this._emptyStars.appendChild(star);
+      this._fullStars.appendChild(fullStar);
+      this._emptyStars.appendChild(emptyStar);
     }
 
     window.addEventListener("resize",  e => {
@@ -113,39 +84,40 @@ class StarRating extends HTMLElement {
       let fullStar = this._fullStars.children[i];
       let emptyStar = this._emptyStars.children[i];
 
-      let starWidthFactor = this.getWidthFactorForStar(i + 1);
-
-      if(starWidthFactor > 0){
-        fullStar.style.width = `${starWidthInPx*starWidthFactor}px`;
-      }
-      else{
-        fullStar.style.width = 0;
-      }
-
-      fullStar.style.height = `${starWidthInPx}px`;
-
-      if(i > 0){
-        fullStar.style.marginLeft = `${spacingInPx/2}px`;
-      }
-
-      if(i < this._numStars - 1){
-        fullStar.style.marginRight = `${spacingInPx/2}px`;
-      }
+      this.updateFullStar(fullStar, i, starWidthInPx, spacingInPx);
 
       // empty stars
-      emptyStar.style.height = `${starWidthInPx}px`;
-      emptyStar.style.width = `${starWidthInPx}px`;
-
-      if(i > 0){
-        emptyStar.style.marginLeft = `${spacingInPx/2}px`;
-      }
-
-      if(i < this._numStars - 1){
-        emptyStar.style.marginRight = `${spacingInPx/2}px`;
-      }
+      this.updateStar(emptyStar, i, starWidthInPx, spacingInPx);
     }
 
     this.style.height = `${starWidthInPx}px`;
+  }
+
+  updateStar(star, starIndex, starWidthInPx, spacingInPx){
+    // empty stars
+    star.style.height = `${starWidthInPx}px`;
+    star.style.width = `${starWidthInPx}px`;
+
+    if(starIndex > 0){
+      star.style.marginLeft = `${spacingInPx/2}px`;
+    }
+
+    if(starIndex < this._numStars - 1){
+      star.style.marginRight = `${spacingInPx/2}px`;
+    }
+  }
+
+  updateFullStar(star, index, starWidthInPx, spacingInPx){
+    this.updateStar(star, index, starWidthInPx, spacingInPx);
+
+    let starWidthFactor = this.getWidthFactorForStar(index + 1);
+
+    if(starWidthFactor > 0){
+      star.style.width = `${starWidthInPx*starWidthFactor}px`;
+    }
+    else{
+      star.style.width = 0;
+    }
   }
 
   static get observedAttributes() {
