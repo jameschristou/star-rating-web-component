@@ -28,6 +28,7 @@ class StarRating extends HTMLElement {
     this._numStars = DEFAULT_NUM_STARS;
     this._maxValue = DEFAULT_MAX_VALUE;
     this._value = 0;
+    this._currentComponentWidth = 0;
   }
 
   connectedCallback() {
@@ -35,6 +36,10 @@ class StarRating extends HTMLElement {
 
     let starWidthInPx = this.getStarWidthInPx();
     let spacingInPx = this.getSpacingInPx(starWidthInPx);
+
+    if(this._currentComponentWidth == 0){
+      this._currentComponentWidth = this.getComponentWidthInPx();
+    }
 
     // we need to create the required stars. We only do this once in this method
     // the only thing we need to worry about changing is the rating value itself
@@ -78,6 +83,19 @@ class StarRating extends HTMLElement {
       this._emptyStars.appendChild(star);
     }
 
+    window.addEventListener("resize",  e => {
+      var newWidth = this.getComponentWidthInPx();
+      
+      if(newWidth != 0 && this._currentComponentWidth != newWidth){
+        this._currentComponentWidth = newWidth;
+
+        console.log('recalculating stars');
+        this.updateStars();
+      }
+
+      console.log('Window resized');
+    });
+
     this.style.height = `${starWidthInPx}px`;
 
     this.appendChild(this._clonedNode);
@@ -87,21 +105,43 @@ class StarRating extends HTMLElement {
     this.validateAttributes();
 
     let starWidthInPx = this.getStarWidthInPx();
+    let spacingInPx = this.getSpacingInPx(starWidthInPx);
 
-    if(typeof starWidthInPx === 'undefined') return;
+    if(typeof starWidthInPx === 'undefined' || starWidthInPx == 0) return;
 
-    // we need to create the required stars. We only do this once in this method
-    // the only thing we need to worry about changing is the rating value itself
     for(let i = 0; i < this._fullStars.children.length; i++){
-      let star = this._fullStars.children[i];
+      let fullStar = this._fullStars.children[i];
+      let emptyStar = this._emptyStars.children[i];
 
       let starWidthFactor = this.getWidthFactorForStar(i + 1);
 
       if(starWidthFactor > 0){
-        star.style.width = `${starWidthInPx*starWidthFactor}px`;
+        fullStar.style.width = `${starWidthInPx*starWidthFactor}px`;
       }
       else{
-        star.style.width = 0;
+        fullStar.style.width = 0;
+      }
+
+      fullStar.style.height = `${starWidthInPx}px`;
+
+      if(i > 0){
+        fullStar.style.marginLeft = `${spacingInPx/2}px`;
+      }
+
+      if(i < this._numStars - 1){
+        fullStar.style.marginRight = `${spacingInPx/2}px`;
+      }
+
+      // empty stars
+      emptyStar.style.height = `${starWidthInPx}px`;
+      emptyStar.style.width = `${starWidthInPx}px`;
+
+      if(i > 0){
+        emptyStar.style.marginLeft = `${spacingInPx/2}px`;
+      }
+
+      if(i < this._numStars - 1){
+        emptyStar.style.marginRight = `${spacingInPx/2}px`;
       }
     }
 
@@ -188,7 +228,7 @@ class StarRating extends HTMLElement {
     }
   }
 
-  getStarWidthInPx(){
+  getComponentWidthInPx(){
     // use this rather than this.clientWidth because we need greater than whole number precision
     // otherwise our stars may not fit correctly if container width is 103.6px but clientWidth tells
     // us its 104px
@@ -197,7 +237,11 @@ class StarRating extends HTMLElement {
       return 0;
     }
 
-    return rect.width/(this._numStars + this._spacingRatioOfStarWidth*(this._numStars - 1));
+    return rect.width;
+  }
+
+  getStarWidthInPx(){
+    return this.getComponentWidthInPx()/(this._numStars + this._spacingRatioOfStarWidth*(this._numStars - 1));
   }
 
   getSpacingInPx(starWidth){
