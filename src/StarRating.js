@@ -29,13 +29,16 @@ class StarRating extends HTMLElement {
     this._maxValue = DEFAULT_MAX_VALUE;
     this._value = 0;
     this._currentComponentWidth = 0;
+
+    this._starWidthInPx = 0;
+    this._spacingInPx = 0;
   }
 
   connectedCallback() {
     this.validateAttributes();
 
-    let starWidthInPx = this.getStarWidthInPx();
-    let spacingInPx = this.getSpacingInPx(starWidthInPx);
+    this._starWidthInPx = this.getStarWidthInPx();
+    this._spacingInPx = this.getSpacingInPx();
 
     if(this._currentComponentWidth == 0){
       this._currentComponentWidth = this.getComponentWidthInPx();
@@ -47,8 +50,8 @@ class StarRating extends HTMLElement {
       let fullStar = starTemplate.content.cloneNode(true).firstChild;
       let emptyStar = starTemplate.content.cloneNode(true).firstChild;
 
-      this.updateFullStar(fullStar, i, starWidthInPx, spacingInPx);
-      this.updateStar(emptyStar, i, starWidthInPx, spacingInPx);
+      this.updateFullStar(fullStar, i);
+      this.updateStar(emptyStar, i);
 
       this._fullStars.appendChild(fullStar);
       this._emptyStars.appendChild(emptyStar);
@@ -60,14 +63,12 @@ class StarRating extends HTMLElement {
       if(newWidth != 0 && this._currentComponentWidth != newWidth){
         this._currentComponentWidth = newWidth;
 
-        console.log('recalculating stars');
+        console.log('resizing stars');
         this.updateStars();
       }
-
-      console.log('Window resized');
     });
 
-    this.style.height = `${starWidthInPx}px`;
+    this.style.height = `${this._starWidthInPx}px`;
 
     this.appendChild(this._clonedNode);
   }
@@ -76,44 +77,46 @@ class StarRating extends HTMLElement {
     this.validateAttributes();
 
     let starWidthInPx = this.getStarWidthInPx();
-    let spacingInPx = this.getSpacingInPx(starWidthInPx);
 
     if(typeof starWidthInPx === 'undefined' || starWidthInPx == 0) return;
+
+    this._starWidthInPx = starWidthInPx;
+    this._spacingInPx = this.getSpacingInPx();
 
     for(let i = 0; i < this._fullStars.children.length; i++){
       let fullStar = this._fullStars.children[i];
       let emptyStar = this._emptyStars.children[i];
 
-      this.updateFullStar(fullStar, i, starWidthInPx, spacingInPx);
+      this.updateFullStar(fullStar, i);
 
       // empty stars
-      this.updateStar(emptyStar, i, starWidthInPx, spacingInPx);
+      this.updateStar(emptyStar, i);
     }
 
     this.style.height = `${starWidthInPx}px`;
   }
 
-  updateStar(star, starIndex, starWidthInPx, spacingInPx){
+  updateStar(star, starIndex){
     // empty stars
-    star.style.height = `${starWidthInPx}px`;
-    star.style.width = `${starWidthInPx}px`;
+    star.style.height = `${this._starWidthInPx}px`;
+    star.style.width = `${this._starWidthInPx}px`;
 
     if(starIndex > 0){
-      star.style.marginLeft = `${spacingInPx/2}px`;
+      star.style.marginLeft = `${this._spacingInPx/2}px`;
     }
 
     if(starIndex < this._numStars - 1){
-      star.style.marginRight = `${spacingInPx/2}px`;
+      star.style.marginRight = `${this._spacingInPx/2}px`;
     }
   }
 
-  updateFullStar(star, index, starWidthInPx, spacingInPx){
-    this.updateStar(star, index, starWidthInPx, spacingInPx);
+  updateFullStar(star, index){
+    this.updateStar(star, index);
 
     let starWidthFactor = this.getWidthFactorForStar(index + 1);
 
     if(starWidthFactor > 0){
-      star.style.width = `${starWidthInPx*starWidthFactor}px`;
+      star.style.width = `${this._starWidthInPx*starWidthFactor}px`;
     }
     else{
       star.style.width = 0;
@@ -216,8 +219,8 @@ class StarRating extends HTMLElement {
     return this.getComponentWidthInPx()/(this._numStars + this._spacingRatioOfStarWidth*(this._numStars - 1));
   }
 
-  getSpacingInPx(starWidth){
-    return starWidth*this._spacingRatioOfStarWidth;
+  getSpacingInPx(){
+    return this._starWidthInPx*this._spacingRatioOfStarWidth;
   }
 
   getWidthFactorForStar(starNumber){
