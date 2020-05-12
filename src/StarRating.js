@@ -220,7 +220,8 @@ class StarRating extends HTMLElement {
   }
 
   getSpacingInPx(){
-    return this._starWidthInPx*this._spacingRatioOfStarWidth;
+    // we stick to 1 decimal point due to an issue on firefox which seems to be make the stars wrap if we're too precise
+    return Math.trunc(this._starWidthInPx*this._spacingRatioOfStarWidth*10)/10;
   }
 
   getWidthFactorForStar(starNumber){
