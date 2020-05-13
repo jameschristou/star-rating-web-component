@@ -13,6 +13,11 @@ starTemplate.innerHTML = `<span class="star"></span>`;
 const DEFAULT_NUM_STARS = 5;
 const DEFAULT_MAX_VALUE = 5;
 
+function isIE() { 
+  var ua = window.navigator.userAgent; 
+  return ua.indexOf('Trident/') > 0 || ua.indexOf('MSIE ') > 0;
+} 
+
 class StarRating extends HTMLElement {
   constructor(){
     super();
@@ -32,6 +37,8 @@ class StarRating extends HTMLElement {
 
     this._starWidthInPx = 0;
     this._spacingInPx = 0;
+
+    this._isIE = isIE();
   }
 
   connectedCallback() {
@@ -100,6 +107,10 @@ class StarRating extends HTMLElement {
     // empty stars
     star.style.height = `${this._starWidthInPx}px`;
     star.style.width = `${this._starWidthInPx}px`;
+
+    if(this._isIE){
+      star.style.backgroundSize = `${this._starWidthInPx}px ${this._starWidthInPx}px`;
+    }
 
     if(starIndex > 0){
       star.style.marginLeft = `${this._spacingInPx/2}px`;
@@ -216,7 +227,11 @@ class StarRating extends HTMLElement {
   }
 
   getStarWidthInPx(){
-    return this.getComponentWidthInPx()/(this._numStars + this._spacingRatioOfStarWidth*(this._numStars - 1));
+    // the stars don't quite work when we have non integer values for the star width so we bump down to the nearest integer for IE.
+    // Otherwise we keep one decimal place which works well for all the modern browsers
+    let truncFactor = this._isIE ? 1 : 10;
+
+    return Math.trunc(this.getComponentWidthInPx()*truncFactor/(this._numStars + this._spacingRatioOfStarWidth*(this._numStars - 1)))/truncFactor;
   }
 
   getSpacingInPx(){

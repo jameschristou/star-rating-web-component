@@ -33,5 +33,9 @@
     "webpack-bundle-analyzer": "^3.5.2",
     "webpack-cli": "^3.3.9",
     "webpack-dev-server": "^3.8.2"
+  },
+  "dependencies": {
+    "@webcomponents/webcomponentsjs": "^2.4.3",
+    "core-js": "^3.6.5"
   }
 }
