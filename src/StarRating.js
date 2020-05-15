@@ -30,108 +30,57 @@ class StarRating extends HTMLElement {
     this._spacingRatioOfStarWidth = 0.6;
 
     // attribute reflected values
-    this._numStars = DEFAULT_NUM_STARS;
-    this._maxValue = DEFAULT_MAX_VALUE;
+    this._numStars;
+    this._maxValue;
     this._value = 0;
+
     this._currentComponentWidth = 0;
 
-    this._starWidthInPx = 0;
-    this._spacingInPx = 0;
+    this._starWidthInPercentage = 0;
+    this._spacingWidthInPercentage = 0;
 
+    // used only for IE
+    this._starWidthInPx = 0;
     this._isIE = isIE();
   }
 
   connectedCallback() {
-    this.validateAttributes();
+    this._validateAttributes();
 
-    this._starWidthInPx = this.getStarWidthInPx();
-    this._spacingInPx = this.getSpacingInPx();
+    this._starWidthInPx = this._getStarWidthInPx();
+    this._starWidthInPercentage = this._getStarWidthAsPercentage();
+    this._spacingWidthInPercentage = this._getSpacingWidthAsPercentage();
 
-    if(this._currentComponentWidth == 0){
-      this._currentComponentWidth = this.getComponentWidthInPx();
-    }
-
-    // we need to create the required stars. We only do this once in this method
-    // the only thing we need to worry about changing is the rating value itself
+    // we need to create the required stars. Star creation only happens once
     for(let i = 0; i < this._numStars; i++){
       let fullStar = starTemplate.content.cloneNode(true).firstChild;
       let emptyStar = starTemplate.content.cloneNode(true).firstChild;
 
-      this.updateFullStar(fullStar, i);
-      this.updateStar(emptyStar, i);
+      this._updateFullStar(fullStar, i);
+      this._updateStar(emptyStar, i);
 
       this._fullStars.appendChild(fullStar);
       this._emptyStars.appendChild(emptyStar);
     }
 
     window.addEventListener("resize",  e => {
-      var newWidth = this.getComponentWidthInPx();
+      var newWidth = this._getComponentWidthInPx();
       
       if(newWidth != 0 && this._currentComponentWidth != newWidth){
         this._currentComponentWidth = newWidth;
+        this._starWidthInPx = this._getStarWidthInPx();
 
-        console.log('resizing stars');
-        this.updateStars();
+        this.style.height = `${this._starWidthInPx}px`;
+
+        if(this._isIE){
+          // if IE then we need to listen out for window resize just in case our container width
+          // changes due to passing through a breakpoint. This will mean having to resize star background
+          this._updateStars();
+        }
       }
     });
 
-    this.style.height = `${this._starWidthInPx}px`;
-
     this.appendChild(this._clonedNode);
-  }
-
-  updateStars(){
-    this.validateAttributes();
-
-    let starWidthInPx = this.getStarWidthInPx();
-
-    if(typeof starWidthInPx === 'undefined' || starWidthInPx == 0) return;
-
-    this._starWidthInPx = starWidthInPx;
-    this._spacingInPx = this.getSpacingInPx();
-
-    for(let i = 0; i < this._fullStars.children.length; i++){
-      let fullStar = this._fullStars.children[i];
-      let emptyStar = this._emptyStars.children[i];
-
-      this.updateFullStar(fullStar, i);
-
-      // empty stars
-      this.updateStar(emptyStar, i);
-    }
-
-    this.style.height = `${starWidthInPx}px`;
-  }
-
-  updateStar(star, starIndex){
-    // empty stars
-    star.style.height = `${this._starWidthInPx}px`;
-    star.style.width = `${this._starWidthInPx}px`;
-
-    if(this._isIE){
-      star.style.backgroundSize = `${this._starWidthInPx}px ${this._starWidthInPx}px`;
-    }
-
-    if(starIndex > 0){
-      star.style.marginLeft = `${this._spacingInPx/2}px`;
-    }
-
-    if(starIndex < this._numStars - 1){
-      star.style.marginRight = `${this._spacingInPx/2}px`;
-    }
-  }
-
-  updateFullStar(star, index){
-    this.updateStar(star, index);
-
-    let starWidthFactor = this.getWidthFactorForStar(index + 1);
-
-    if(starWidthFactor > 0){
-      star.style.width = `${this._starWidthInPx*starWidthFactor}px`;
-    }
-    else{
-      star.style.width = 0;
-    }
   }
 
   static get observedAttributes() {
@@ -140,25 +89,29 @@ class StarRating extends HTMLElement {
   
   attributeChangedCallback(attrName, oldValue, newValue) {
     if(attrName == 'class' || attrName == 'style'){
-      this.style.height = `${this.getStarWidthInPx()}px`;
+      this.style.height = `${this._getStarWidthInPx()}px`;
       return;
     }
 
     if(newValue == oldValue) return;
-
-    this[attrName] = newValue;
 
     // reflecting attributes which have hyphens in attribute name. We need this code
     // because custom elements do not automatically reflect such attributes to property
     // names. We use hyphenated names because this is convention and we can't use
     // camelcased attribute names because the HTML standard does not support them
     if(attrName == 'max-value'){
+      // use the property setters
       this.maxValue = newValue;
+      return;
     }
 
     if(attrName == 'num-stars'){
+      // use the property setters
       this.numStars = newValue;
+      return;
     }
+
+    this[attrName] = newValue;
   }
 
   get value() {
@@ -182,13 +135,13 @@ class StarRating extends HTMLElement {
 
     this._value = floatVal;
 
-    this.updateStars();
+    this._updateStars();
   }
 
   // property for setting the max-value attribute
   set maxValue(val) {
     var intVal = parseInt(val);
-    if(isNaN(intVal ) || intVal < 0){
+    if(isNaN(intVal) || intVal < 0){
       // default value
       this._maxValue = DEFAULT_MAX_VALUE;
     }
@@ -199,7 +152,7 @@ class StarRating extends HTMLElement {
   // property for setting the num-stars attribute
   set numStars(val) {
     var intVal = parseInt(val);
-    if(isNaN(intVal ) || intVal < 0){
+    if(isNaN(intVal) || intVal < 0){
       // default value
       this._numStars = DEFAULT_NUM_STARS;
     }
@@ -207,14 +160,68 @@ class StarRating extends HTMLElement {
     this._numStars = intVal;
   }
 
-  validateAttributes(){
-    // value cannot be greater than maxValue
-    if(this._value > this._maxValue){
-      this.value = this._maxValue;
+  _updateStars(){
+    this._validateAttributes();
+
+    let starWidthInPx = this._getStarWidthInPx();
+
+    if(typeof starWidthInPx === 'undefined' || starWidthInPx == 0) return;
+
+    this._starWidthInPx = starWidthInPx;
+
+    for(let i = 0; i < this._fullStars.children.length; i++){
+      let fullStar = this._fullStars.children[i];
+      let emptyStar = this._emptyStars.children[i];
+
+      this._updateFullStar(fullStar, i);
+
+      // empty stars
+      this._updateStar(emptyStar, i);
     }
   }
 
-  getComponentWidthInPx(){
+  _updateStar(star, starIndex){
+    // empty stars
+    star.style.width = `${this._starWidthInPercentage}%`;
+
+    if(this._isIE){
+      star.style.backgroundSize = `${this._starWidthInPx}px ${this._starWidthInPx}px`;
+    }
+
+    if(starIndex > 0){
+      star.style.marginLeft = `${this._spacingWidthInPercentage/2}%`;
+    }
+
+    if(starIndex < this._numStars - 1){
+      star.style.marginRight = `${this._spacingWidthInPercentage/2}%`;
+    }
+  }
+
+  _updateFullStar(star, index){
+    this._updateStar(star, index);
+
+    let starWidthFactor = this._getWidthFactorForStar(index + 1);
+
+    if(starWidthFactor > 0){
+      star.style.width = `${this._starWidthInPercentage*starWidthFactor}%`;
+    }
+    else{
+      star.style.width = 0;
+    }
+  }
+
+  _validateAttributes(){
+    if(!this._maxValue) this._maxValue = DEFAULT_MAX_VALUE;
+
+    // value cannot be greater than maxValue
+    if(this._value > this._maxValue){
+      this._value = this._maxValue;
+    }
+
+    if(!this._numStars) this._numStars = DEFAULT_NUM_STARS;
+  }
+
+  _getComponentWidthInPx(){
     // use this rather than this.clientWidth because we need greater than whole number precision
     // otherwise our stars may not fit correctly if container width is 103.6px but clientWidth tells
     // us its 104px
@@ -226,26 +233,40 @@ class StarRating extends HTMLElement {
     return rect.width;
   }
 
-  getStarWidthInPx(){
+  _getStarWidthInPx(){
     // the stars don't quite work when we have non integer values for the star width so we bump down to the nearest integer for IE.
     // Otherwise we keep one decimal place which works well for all the modern browsers
     let truncFactor = this._isIE ? 1 : 10;
 
-    return Math.trunc(this.getComponentWidthInPx()*truncFactor/(this._numStars + this._spacingRatioOfStarWidth*(this._numStars - 1)))/truncFactor;
+    return Math.trunc(this._getComponentWidthInPx()*truncFactor/(this._numStars + this._spacingRatioOfStarWidth*(this._numStars - 1)))/truncFactor;
   }
 
-  getSpacingInPx(){
+  _getStarWidthAsPercentage(){
+    // the stars don't quite work when we have non integer values for the star width so we bump down to the nearest integer for IE.
+    // Otherwise we keep one decimal place which works well for all the modern browsers
+    let truncFactor = this._isIE ? 1 : 10;
+
+    //return Math.trunc(this.getComponentWidthInPx()*truncFactor/(this._numStars + this._spacingRatioOfStarWidth*(this._numStars - 1)))/truncFactor;
+    return Math.trunc(100*truncFactor/(this._numStars + this._spacingRatioOfStarWidth*(this._numStars - 1)))/truncFactor;
+  }
+
+  _getSpacingWidthAsPercentage(){
     // we stick to 1 decimal point due to an issue on firefox which seems to be make the stars wrap if we're too precise
-    return Math.trunc(this._starWidthInPx*this._spacingRatioOfStarWidth*10)/10;
+    return Math.trunc(this._starWidthInPercentage*this._spacingRatioOfStarWidth*10)/10;
   }
 
-  getWidthFactorForStar(starNumber){
+  // works out how much of the current full star should be filled
+  _getWidthFactorForStar(starNumber){
     let valuePerStar = this._maxValue/this._numStars;
 
-    if(valuePerStar*starNumber <= this._value) return 1;
+    if(valuePerStar*starNumber <= this._value){
+      return 1;
+    }
 
     // some proportion of current star
-    if(valuePerStar*starNumber > this._value && valuePerStar*(starNumber - 1) < this._value) return (this._value - valuePerStar*(starNumber - 1))/valuePerStar;
+    if(valuePerStar*starNumber > this._value && valuePerStar*(starNumber - 1) < this._value) {
+      return (this._value - valuePerStar*(starNumber - 1))/valuePerStar;
+    }
 
     return 0;
   }
