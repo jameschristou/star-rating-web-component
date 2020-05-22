@@ -1,8 +1,13 @@
 {
+  "name": "@jchristou/star-rating-web-component",
+  "version": "0.0.2",
   "description": "Star rating web component",
+  "main": "dist-component/StarRating.js",
   "scripts": {
-    "start": "webpack-dev-server --config webpack.config.js"
+    "start": "webpack-dev-server --config webpack/webpack.config.js",
+    "build:component": "webpack --config webpack/webpack.component.config.js"
   },
+  "files":["dist-component", "README.md"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jameschristou/star-rating-web-component"
@@ -10,9 +15,13 @@
   "keywords": [
     "web components",
     "html templates",
-    "custom elements"
+    "custom elements",
+    "star rating"
   ],
   "author": "James Christou",
+  "bugs": {
+    "url": "https://github.com/jameschristou/star-rating-web-component/issues"
+  },
   "devDependencies": {
     "@babel/core": "^7.6.4",
     "@babel/preset-env": "^7.6.3",
