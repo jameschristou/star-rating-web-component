@@ -1,6 +1,6 @@
 {
   "name": "@jchristou/star-rating-web-component",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Star rating web component",
   "main": "dist-component/StarRating.js",
   "scripts": {
