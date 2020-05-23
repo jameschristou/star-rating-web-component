@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Star Rating Test</title>
+        <style>
+          .value{
+            width:40px;
+            margin-right:20px;
+            display:inline-block;
+            vertical-align:middle;
+          }
+
+          .container-large{
+            width: 400px;
+            display:inline-block;
+            margin: 10px 0;
+          }
+
+          .container-med{
+            width: 200.2px;
+            display:inline-block;
+            margin: 10px 0;
+          }
+
+          .container-small{
+            width: 101.256px;
+            display:inline-block;
+            margin: 10px 0;
+          }
+
+          @media (max-width: 600px) {
+            .container-small{
+              width: 201.256px;
+            }
+          }
+        </style>
+    </head>
+    <body>
+      <div><div class="value">3.5/5</div><star-rating num-stars="5" max-value="5" value="3.5" class="container-small"></star-rating></div>
+      <div><div class="value">3.5/5</div><star-rating num-stars="5" max-value="5" value="3.5" class="container-med"></star-rating></div>
+      <div><div class="value">3.5/5</div><star-rating num-stars="5" max-value="5" value="3.5" class="container-large"></star-rating></div>
+      <div><div class="value">7/10</div><star-rating num-stars="5" max-value="10" value="7" class="container-small dark-style"></star-rating></div>
+      <div><div class="value">7/10</div><star-rating num-stars="5" max-value="10" value="7" class="container-med dark-style"></star-rating></div>
+      <div><div class="value">7/10</div><star-rating num-stars="5" max-value="10" value="7" class="container-large dark-style"></star-rating></div>
+      <div><div class="value">62/100</div><star-rating num-stars="10" max-value="100" value="62" class="container-small"></star-rating></div>
+      <div><div class="value">62/100</div><star-rating num-stars="10" max-value="100" value="62" class="container-med"></star-rating></div>
+      <div><div class="value">62/100</div><star-rating num-stars="10" max-value="100" value="62" class="container-large"></star-rating></div>
+
+      <div><div class="value">2.7</div><star-rating value="2.7" class="container-small"></star-rating></div>
+      <div><div class="value">2.7</div><star-rating value="2.7" class="container-med"></star-rating></div>
+      <div><div class="value">2.7</div><star-rating value="2.7" class="container-large"></star-rating></div>
+    </body>
+</html>

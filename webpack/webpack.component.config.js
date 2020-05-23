@@ -5,13 +5,13 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 module.exports = {
   mode: 'production',
   entry: {
-    ReactAutoCompleteTagsInput: './src/StarRating.js',
+    StarRating: './src/StarRating.js',
   },
   module: {
     rules: [
       {
         test: /\.(js)$/,
-        exclude: /node_modules/,
+        exclude: ['/node_modules/', '/example/'],
         use: ['babel-loader', 'eslint-loader']
       },
       {

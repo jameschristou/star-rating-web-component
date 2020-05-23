@@ -1,0 +1,12 @@
+@import '@jchristou/star-rating-web-component/dist-component/StarRating.scss';
+
+.dark-style{
+    .star-rating{
+        &__stars-empty{
+            .star{
+                // override the star colours
+                @include icon-star-full(orange, grey);
+            }
+        }
+    }
+}
