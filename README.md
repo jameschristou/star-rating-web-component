@@ -17,26 +17,22 @@ npm install @jchristou/star-rating-web-component
 ```
 
 ## Usage
-See the [example project](https://github.com/jameschristou/react-autocomplete-tags-input/tree/master/example). This uses the `npm` published version of the component.
+See the [example project](https://github.com/jameschristou/star-rating-web-component/tree/master/example). This uses the `npm` published version of the component.
 
 ### Default Styling
-To include the default styling you can import it as a SASS file
+To include the default styling you import the SASS file
 ```js
 import '@jchristou/star-rating-web-component/dist-component/StarRating.scss';
 ```
-or as a compiled CSS file
-```js
-import '@jchristou/star-rating-web-component/dist-component/StarRating.css';
-```
 
 ### Override Styling
-You can choose not to use the provided styles and provide your own or you can also override the provided styles. An example of this is shown in the [example project](https://github.com/jameschristou/react-autocomplete-tags-input/tree/master/example) by examining [style.scss](https://github.com/jameschristou/react-autocomplete-tags-input/tree/master/example/src/style.scss).
+You can choose not to use the provided styles and provide your own or you can also override the provided styles. An example of this is shown in the [example project](https://github.com/jameschristou/star-rating-web-component/tree/master/example) by examining [style.scss](https://github.com/jameschristou/star-rating-web-component/tree/master/example/src/style.scss).
 
 ### Responsive
 The component listens for the window resize event and checks whether its container width has changed. If the container width has changed then it resizes the stars and spacing to fit the new width. This makes the component responsive.
 
 ## Browser Support
-This component uses the Custom Element API as well as HTML Templates from the Web Components specification. Older browsers such as IE11 do not natively support this and so you will need to install the `@webcomponents/webcomponentsjs` polyfill package (this is done in the [example project](https://github.com/jameschristou/react-autocomplete-tags-input/tree/master/example)) to support these browsers. The component has been tested down to IE11 using this polyfill.
+This component uses the Custom Element API as well as HTML Templates from the Web Components specification. Older browsers such as IE11 do not natively support this and so you will need to install the `@webcomponents/webcomponentsjs` polyfill package (this is done in the [example project](https://github.com/jameschristou/star-rating-web-component/tree/master/example)) to support these browsers. The component has been tested down to IE11 using this polyfill.
 
 ## Development
 Run `npm install` to install all packages and depenedencies.

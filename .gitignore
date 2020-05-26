@@ -1,6 +1,7 @@
 /node_modules/
 /dist/
 /dist-component/
+/out/
 */node_modules/
 */dist/
 */dist-component/

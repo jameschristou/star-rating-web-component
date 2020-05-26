@@ -39,7 +39,7 @@
     "webpack-dev-server": "^3.8.2"
   },
   "dependencies": {
-    "@jchristou/star-rating-web-component": "0.0.2",
+    "@jchristou/star-rating-web-component": "0.0.7",
     "@webcomponents/webcomponentsjs": "^2.4.3",
     "core-js": "^3.6.5"
   }

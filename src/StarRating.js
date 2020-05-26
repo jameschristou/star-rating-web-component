@@ -1,5 +1,3 @@
-import "./StarRating.scss";
-
 const componentTemplate = document.createElement('template');
 componentTemplate.innerHTML = `
 <div class="star-rating">

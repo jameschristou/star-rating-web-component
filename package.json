@@ -1,13 +1,17 @@
 {
   "name": "@jchristou/star-rating-web-component",
-  "version": "0.0.4",
-  "description": "Star rating web component",
-  "main": "dist-component/StarRating.js",
+  "version": "0.0.7",
+  "description": "Star Rating Web Component",
+  "main": "dist/StarRating.js",
   "scripts": {
     "start": "webpack-dev-server --config webpack/webpack.config.js",
-    "build:component": "webpack --config webpack/webpack.component.config.js"
+    "build:component": "webpack --config webpack/webpack.component.config.js",
+    "create:dist": "copyfiles -f ./src/StarRating.js ./src/StarRating.scss dist"
   },
-  "files":["dist-component", "README.md"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jameschristou/star-rating-web-component"
@@ -19,6 +23,7 @@
     "star rating"
   ],
   "author": "James Christou",
+  "license": "ISC",
   "bugs": {
     "url": "https://github.com/jameschristou/star-rating-web-component/issues"
   },
@@ -28,6 +33,7 @@
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.0.6",
     "clean-webpack-plugin": "^3.0.0",
+    "copyfiles": "^2.2.0",
     "css-loader": "^3.2.0",
     "dotenv-webpack": "^1.7.0",
     "eslint": "^6.5.1",

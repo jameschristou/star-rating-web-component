@@ -10,11 +10,6 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js)$/,
-        exclude: ['/node_modules/', '/example/'],
-        use: ['babel-loader', 'eslint-loader']
-      },
-      {
         test: /\.s?css$/,
         use: [
           {
@@ -30,7 +25,7 @@ module.exports = {
     extensions: ['*', '.js']
   },
   output: {
-    path: path.resolve(__dirname, '../', 'dist-component'),
+    path: path.resolve(__dirname, '../', 'out'),
     publicPath: '/',
     filename: 'StarRating.js',
     libraryTarget: 'umd',
