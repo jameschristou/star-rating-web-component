@@ -37,29 +37,15 @@ class StarRating extends HTMLElement {
     this._starWidthInPercentage = 0;
     this._spacingWidthInPercentage = 0;
 
+    this._isInitialised = false;
+
     // used only for IE
     this._starWidthInPx = 0;
     this._isIE = isIE();
   }
 
   connectedCallback() {
-    this._validateAttributes();
-
-    this._starWidthInPx = this._getStarWidthInPx();
-    this._starWidthInPercentage = this._getStarWidthAsPercentage();
-    this._spacingWidthInPercentage = this._getSpacingWidthAsPercentage();
-
-    // we need to create the required stars. Star creation only happens once
-    for(let i = 0; i < this._numStars; i++){
-      let fullStar = starTemplate.content.cloneNode(true).firstChild;
-      let emptyStar = starTemplate.content.cloneNode(true).firstChild;
-
-      this._updateFullStar(fullStar, i);
-      this._updateStar(emptyStar, i);
-
-      this._fullStars.appendChild(fullStar);
-      this._emptyStars.appendChild(emptyStar);
-    }
+    this._updateStars();
 
     window.addEventListener("resize",  e => {
       var newWidth = this._getComponentWidthInPx();
@@ -79,6 +65,7 @@ class StarRating extends HTMLElement {
     });
 
     this.appendChild(this._clonedNode);
+    this._isInitialised = true;
   }
 
   static get observedAttributes() {
@@ -133,7 +120,7 @@ class StarRating extends HTMLElement {
 
     this._value = floatVal;
 
-    this._updateStars();
+    this._resetStars();
   }
 
   // property for setting the max-value attribute
@@ -145,6 +132,8 @@ class StarRating extends HTMLElement {
     }
 
     this._maxValue = intVal;
+
+    this._resetStars();
   }
 
   // property for setting the num-stars attribute
@@ -156,6 +145,17 @@ class StarRating extends HTMLElement {
     }
 
     this._numStars = intVal;
+
+    this._resetStars();
+  }
+
+  _resetStars(){
+    // if this component is not yet initialised then don't go updating elements
+    // (_updateStars gets called in parallel to connectedCallback due to value been set)
+    // might need an explicit this._isInitialised to handle this properly
+    if(!this._isInitialised) return;
+
+    this._updateStars();
   }
 
   _updateStars(){
@@ -167,15 +167,29 @@ class StarRating extends HTMLElement {
 
     this._starWidthInPx = starWidthInPx;
 
-    for(let i = 0; i < this._fullStars.children.length; i++){
-      let fullStar = this._fullStars.children[i];
-      let emptyStar = this._emptyStars.children[i];
+    this._starWidthInPercentage = this._getStarWidthAsPercentage();
+    this._spacingWidthInPercentage = this._getSpacingWidthAsPercentage();
+
+    // make sure the nodes are empty otherwise we might be adding children again if the element
+    // is reattached to the DOM (this is common in Angular)
+    // TODO: look at replacing this with using MutationObserver
+    // https://medium.com/patternfly-elements/more-resilientweb-components-in-angular-or-anywhere-else-with-mutationobserver-72a91cd7cf22
+    this._fullStars.innerHTML = "";
+    this._emptyStars.innerHTML = "";
+
+    // we need to create the required stars. Star creation only happens once
+    for(let i = 0; i < this._numStars; i++){
+      let fullStar = starTemplate.content.cloneNode(true).firstChild;
+      let emptyStar = starTemplate.content.cloneNode(true).firstChild;
 
       this._updateFullStar(fullStar, i);
-
-      // empty stars
       this._updateStar(emptyStar, i);
+
+      this._fullStars.appendChild(fullStar);
+      this._emptyStars.appendChild(emptyStar);
     }
+
+    this.style.height = `${this._starWidthInPx}px`;
   }
 
   _updateStar(star, starIndex){
