@@ -64,6 +64,11 @@ class StarRating extends HTMLElement {
       }
     });
 
+    // Ensure that there are no existing children present before appending
+    // There could be existing children if the custom element is cloned (by copying innerHTML of a parent element). Then when this
+    // HTML is added to the DOM connectedCallback will be called for this new instance. This can result in a double up of the
+    // child elements (double stars!)
+    this.innerHTML = '';
     this.appendChild(this._clonedNode);
     this._isInitialised = true;
   }
